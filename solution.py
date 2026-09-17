@@ -269,7 +269,7 @@ def train_and_predict(train_df, test_df, public_dir, submission_out):
 
                 if acc > best_acc:
                     best_acc = acc
-                    best_model_state = {k: v.cpu() for k, v in model.state_dict().items()}
+best_model_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
 
             print(f"    Best Val Acc: {best_acc:.4f}")
             if best_model_state is not None:
