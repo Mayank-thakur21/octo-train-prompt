@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/* `dark:` utilities apply inside <html class="dark"> (set by theme-init.js and SettingsContext). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Semantic design tokens. Utilities such as `bg-surface`, `text-fg-muted` or
+ * `border-line-strong` resolve to the CSS variables below, which switch with
+ * the theme, so components rarely need explicit `dark:` variants.
+ * Every text/background pair used by the UI meets WCAG AA (4.5:1 for text,
+ * 3:1 for input borders and focus indicators) in both themes.
+ */
+@theme inline {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --color-canvas: var(--pes-canvas);
+  --color-surface: var(--pes-surface);
+  --color-surface-muted: var(--pes-surface-muted);
+  --color-line: var(--pes-line);
+  --color-line-strong: var(--pes-line-strong);
+  --color-fg: var(--pes-fg);
+  --color-fg-muted: var(--pes-fg-muted);
+  --color-accent: var(--pes-accent);
+  --color-accent-hover: var(--pes-accent-hover);
+  --color-accent-fg: var(--pes-accent-fg);
+  --color-accent-text: var(--pes-accent-text);
+  --color-accent-soft: var(--pes-accent-soft);
+  --color-success: var(--pes-success);
+  --color-success-soft: var(--pes-success-soft);
+  --color-danger: var(--pes-danger);
+  --color-danger-soft: var(--pes-danger-soft);
+  --color-warning: var(--pes-warning);
+  --color-warning-soft: var(--pes-warning-soft);
+  --color-info: var(--pes-info);
+  --color-info-soft: var(--pes-info-soft);
+  --color-ring: var(--pes-ring);
+  --color-backdrop: var(--pes-backdrop);
+}
+
+:root {
+  --pes-canvas: #f6f7fb;
+  --pes-surface: #ffffff;
+  --pes-surface-muted: #f1f3f8;
+  --pes-line: #e2e6ef;
+  --pes-line-strong: #858fa3;
+  --pes-fg: #111827;
+  --pes-fg-muted: #4b5563;
+  --pes-accent: #4f46e5;
+  --pes-accent-hover: #4338ca;
+  --pes-accent-fg: #ffffff;
+  --pes-accent-text: #4338ca;
+  --pes-accent-soft: #eef0ff;
+  --pes-success: #15803d;
+  --pes-success-soft: #ecfdf3;
+  --pes-danger: #b91c1c;
+  --pes-danger-soft: #fef2f2;
+  --pes-warning: #a14a07;
+  --pes-warning-soft: #fffbeb;
+  --pes-info: #1d4ed8;
+  --pes-info-soft: #eff6ff;
+  --pes-ring: #4f46e5;
+  --pes-backdrop: rgb(15 23 42 / 0.55);
+  color-scheme: light;
+}
+
+:root.dark {
+  --pes-canvas: #0b0f19;
+  --pes-surface: #121826;
+  --pes-surface-muted: #1a2132;
+  --pes-line: #283043;
+  --pes-line-strong: #6b7588;
+  --pes-fg: #e6e9f0;
+  --pes-fg-muted: #a3acbd;
+  --pes-accent: #5b5bd6;
+  /* Darker on hover: white text keeps 6.4:1 (a lighter hover fell to 4.3:1). */
+  --pes-accent-hover: #4f4fc9;
+  --pes-accent-fg: #ffffff;
+  --pes-accent-text: #a5b4fc;
+  --pes-accent-soft: #1e2350;
+  --pes-success: #4ade80;
+  --pes-success-soft: #0f2a1c;
+  --pes-danger: #f87171;
+  --pes-danger-soft: #3a1414;
+  --pes-warning: #fbbf24;
+  --pes-warning-soft: #33240a;
+  --pes-info: #93c5fd;
+  --pes-info-soft: #13213d;
+  --pes-ring: #a5b4fc;
+  --pes-backdrop: rgb(0 0 0 / 0.65);
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /*
+     * Keep focused elements and #anchors clear of the sticky top bar (3.5rem)
+     * when the browser scrolls them into view, also when tabbing backwards
+     * (WCAG 2.4.11 Focus Not Obscured).
+     */
+    scroll-padding-top: 4.5rem;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-fg antialiased;
+    min-height: 100dvh;
+  }
+
+  /* One consistent, high-contrast focus indicator for every focusable element. */
+  :focus-visible {
+    outline: 2px solid var(--pes-ring);
+    outline-offset: 2px;
+  }
+
+  [tabindex="-1"]:focus {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--pes-accent-soft);
+    color: var(--pes-fg);
+  }
+}
+
+@layer components {
+  /* Typography for model output rendered by <Markdown>. */
+  .markdown {
+    overflow-wrap: anywhere;
+    line-height: 1.65;
+  }
+  .markdown > :first-child {
+    margin-top: 0;
+  }
+  .markdown > :last-child {
+    margin-bottom: 0;
+  }
+  .markdown p,
+  .markdown ul,
+  .markdown ol,
+  .markdown blockquote,
+  .markdown table,
+  .markdown pre {
+    margin: 0.75rem 0;
+  }
+  .markdown h1,
+  .markdown h2,
+  .markdown h3,
+  .markdown h4,
+  .markdown h5,
+  .markdown h6 {
+    margin: 1.25rem 0 0.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .markdown h1 {
+    font-size: 1.375rem;
+  }
+  .markdown h2 {
+    font-size: 1.2rem;
+  }
+  .markdown h3 {
+    font-size: 1.05rem;
+  }
+  .markdown ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+  }
+  .markdown ol {
+    list-style: decimal;
+    padding-left: 1.4rem;
+  }
+  .markdown li + li {
+    margin-top: 0.25rem;
+  }
+  .markdown li > ul,
+  .markdown li > ol {
+    margin: 0.25rem 0;
+  }
+  .markdown a {
+    color: var(--pes-accent-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .markdown blockquote {
+    border-left: 3px solid var(--pes-line-strong);
+    padding-left: 0.85rem;
+    color: var(--pes-fg-muted);
+  }
+  .markdown :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--pes-surface-muted);
+    border: 1px solid var(--pes-line);
+    border-radius: 0.3rem;
+    padding: 0.05rem 0.3rem;
+  }
+  .markdown pre {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    background: var(--pes-surface-muted);
+    border: 1px solid var(--pes-line);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+  }
+  .markdown table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .markdown th,
+  .markdown td {
+    border: 1px solid var(--pes-line);
+    padding: 0.35rem 0.6rem;
+    text-align: left;
+  }
+  .markdown th {
+    background: var(--pes-surface-muted);
+    font-weight: 600;
+  }
+  .markdown hr {
+    border: 0;
+    border-top: 1px solid var(--pes-line);
+    margin: 1rem 0;
+  }
+  .markdown input[type="checkbox"] {
+    margin-right: 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
