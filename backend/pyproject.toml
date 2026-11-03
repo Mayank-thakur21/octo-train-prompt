@@ -1,0 +1,44 @@
+[project]
+name = "prompt-studio-backend"
+version = "2.0.0"
+description = "Backend API for Prompt Engineering Studio: multi-provider prompt runs, versioned prompt library, comparisons and evaluations."
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Mayank Thakur" }]
+readme = "../README.md"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".venv", "data"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "S", "ASYNC",
+    "RUF", "PT", "ANN", "T20", "DTZ", "LOG", "G",
+]
+ignore = ["ANN401"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "ANN", "S105", "S106"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra --strict-markers --cov=app --cov-branch --cov-report=term-missing --cov-fail-under=90"
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+# SQLAlchemy's asyncio layer runs ORM work in greenlets.
+concurrency = ["greenlet", "thread"]
+
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:", "@overload"]
+show_missing = true
+skip_covered = true

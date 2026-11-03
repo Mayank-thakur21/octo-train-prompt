@@ -1,5 +1,11 @@
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-pydantic==2.7.1
-google-generativeai==0.7.2
-python-dotenv==1.0.1
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.2
+pydantic-settings==2.16.2
+sqlalchemy[asyncio]==2.1.6
+aiosqlite==0.22.1
+anthropic==2.4.0
+openai==3.42.1
+google-genai==2.34.0
+limits==5.8.0
+regex==2026.9.29

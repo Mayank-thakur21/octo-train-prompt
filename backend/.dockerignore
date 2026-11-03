@@ -1,0 +1,17 @@
+# Keep the build context small and free of local state and secrets.
+tests/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+.venv/
+venv/
+data/
+*.db
+*.db-*
+.env
+.env.*
