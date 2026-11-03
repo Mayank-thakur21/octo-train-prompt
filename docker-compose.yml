@@ -1,22 +1,76 @@
-version: "3.9"
+# Prompt Engineering Studio
+#
+#   cp .env.example .env    # optional: add provider keys and API_KEYS
+#   docker compose up --build -d
+#
+# UI: http://localhost:3000   API docs: http://localhost:3000/api/docs
+# Only the frontend is published; it serves the app and proxies /api to the backend.
+
+name: prompt-studio
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+    build: ./backend
+    image: prompt-studio-backend:2.0.0
     env_file:
-      - .env
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:////app/data/studio.db
+      LOG_FORMAT: json
+      # Only the frontend proxy may set X-Forwarded-For (its address is pinned below).
+      TRUSTED_PROXIES: 172.28.0.10
+    volumes:
+      - studio-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    networks:
+      - studio
     restart: unless-stopped
 
   frontend:
-    image: nginx:alpine
+    build: ./frontend
+    image: prompt-studio-frontend:2.0.0
     ports:
-      - "3000:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html:ro
+      - "3000:8080"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    networks:
+      studio:
+        ipv4_address: 172.28.0.10
     restart: unless-stopped
+
+networks:
+  studio:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  studio-data:
