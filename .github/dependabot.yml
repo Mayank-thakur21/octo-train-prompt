@@ -16,6 +16,13 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
+    ignore:
+      # typescript-eslint supports TypeScript < 6.1, and the runtime (CI, Docker) is Node 22:
+      # move these majors deliberately, together with their tooling.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor-and-patch:
         patterns: ["*"]
@@ -38,6 +45,10 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 3
+    ignore:
+      # The frontend build image tracks the Node version CI tests with (22).
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
     groups:
       docker-minor-and-patch:
         patterns: ["*"]
