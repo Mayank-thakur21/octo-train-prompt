@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import threading
+
 from app.providers.base import ProviderName
 from app.services.tokens import EXACT_COUNT_FAILED, estimate, estimate_request
 from tests.fakes import ScriptedProvider
@@ -42,9 +44,22 @@ async def test_ready_fails_when_database_is_down(make_app) -> None:
 async def test_database_ping_reports_failures() -> None:
     from app.db import Database
 
+    threads_before = set(threading.enumerate())
     broken = Database("sqlite+aiosqlite:////nonexistent-dir/sub/x.db")
     assert not await broken.ping()
     await broken.dispose()
+    # When a connection fails to open, aiosqlite stops its worker thread without waiting for
+    # it. Join that thread while this test's event loop is still open: if it finishes after
+    # the loop is closed, it raises "Event loop is closed" and the next test errors.
+    workers = [
+        thread
+        for thread in set(threading.enumerate()) - threads_before
+        if "_connection_worker_thread" in thread.name  # "Thread-N (<target name>)"
+    ]
+    assert workers, "expected the failed connection's aiosqlite worker thread"
+    for thread in workers:
+        thread.join(timeout=10)
+        assert not thread.is_alive()
 
 
 async def test_meta_in_demo_mode(client) -> None:
