@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build stage: install exact dependencies from the lockfile and build the SPA ----
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 ENV CI=true
 COPY package.json package-lock.json ./
